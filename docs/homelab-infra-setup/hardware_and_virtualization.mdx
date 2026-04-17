@@ -1,0 +1,53 @@
+---
+sidebar_position: 3
+---
+
+# Hardware, OS and Virtualization
+
+## Hardware used
+
+1. Lenovo ThinkCentre : i3 (4 Cores), 8Gb RAM, 128 GB SSD (SATA)
+2. Raspberry Pi 4 Model B : 2 GB
+3. 128GB HP pendrive (Not the most reliable as no RAID setup and USBs are not as reliable as a external SSD/ HDD)
+4. TPLink Router (Any router will do as long as the DHCP range is not set to full)
+
+These devices are sufficient for my homelab setup currently.
+I will definitely add a more robust storage solution in future with a RAID setup, however, this is okay for my temporary setup for jellyfin server.
+
+One more thing to be added in the future is a local DNS server like PiHole for accessing my Jellyfin server with a private DNS, recognized by all my devices.
+
+Note: I have used the Raspberry Pi as an extra node for now. It will not serve jellyfin pods for now, however, just to add a multi-agent setup, I have used the Raspberry Pi.
+
+## Operating Systems
+
+1. Proxmox on Lenovo ThinkCentre (Hypervisor Type 1)
+2. Raspberry Pi OS : Debian Trixie on Raspberry Pi 4
+3. OpenMediaVault NAS OS
+
+## VMs deployed and managed
+
+1. OpenMediaVault for NFS file share and acting as a NAS
+2. 2 Debian Trixie VMs in Proxmox - One for k3s server and another for k3s agent.
+3. Raspberry Pi OS (no VM) on Raspberry Pi 4.
+
+## Specifications of the Proxmox VMs
+
+1. deb-k3s-master - Single k3s server node:
+    - 2 vCPUs
+    - 2 GB RAM with no ballooning
+    - 16 GB disk (SATA 0)
+    - Others are set to default.
+2. deb-k3s-agent - k3s agent:
+    - 2 vCPUs
+    - 2 GB RAM with no ballooning
+    - 25 GB disk (SATA 0)
+    - Others are set to default.
+3. omv-nas - OpenMediaVault NAS server:
+    - 1 vCPUs
+    - 2 GB RAM
+    - 8 GB disk (SATA 0)
+    - Others are set to default.
+
+### Why Debian Trixie (Debian 13) was chosen over Ubuntu Server?
+
+Debian Trixie is a light weight OS which consumes RAM in the range of 400MB-700MB. This is perfectly suitable for VMs running with 2GB of RAM without balooning and hosting a k3s cluster. On the otherhand, Ubuntu server was found to consume 1-2GB of RAM when k3s was installed both as master and agent nodes, and thus a lighter OS like Debian Trixie was preferred.
