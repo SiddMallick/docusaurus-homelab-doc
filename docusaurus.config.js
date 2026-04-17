@@ -93,10 +93,8 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'homelabdocSidebar',
             position: 'left',
-            label: 'Homelab Docs',
-            to: '/docs'
+            label: 'Homelab Docs'
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/SiddMallick/docusaurus-homelab-doc',
             label: 'GitHub',
@@ -138,7 +136,7 @@ const config = {
             items: [
               {
                 label: 'Docs',
-                to: '/docs',
+                to: '/docs/intro',
               },
               {
                 label: 'GitHub',
