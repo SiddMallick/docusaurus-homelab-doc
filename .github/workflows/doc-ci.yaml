@@ -20,7 +20,7 @@ env:
 jobs:
 
     ci:
-        if: startsWith(github.ref, 'refs/heads/feature/')
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/feature/') 
         runs-on: ubuntu-22.04
 
         steps:
