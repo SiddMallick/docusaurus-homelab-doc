@@ -20,7 +20,7 @@ env:
 jobs:
 
     ci:
-        if: github.ref == 'pull_requests' || startsWith(github.ref, 'refs/heads/feature/') 
+        if: github.event_name == 'pull_requests' || startsWith(github.ref, 'refs/heads/feature/') 
         runs-on: ubuntu-22.04
 
         steps:
@@ -76,7 +76,7 @@ jobs:
         name: CodeQL Scan
         runs-on: ubuntu-22.04
 
-        if: github.event_name == 'pull_request' || github.ref == 'refs/head/main'
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
 
         
         steps:
@@ -105,7 +105,7 @@ jobs:
         steps:
             - name: Build Docker Image
               run: |
-                docker build -t $IMAGE_NAME:pr-${{ github.event.number }}
+                docker build -t $IMAGE_NAME:pr-${{ github.event.number }} .
             
             - name: Trivy Scan (on PR)
               uses: aquasecurity/trivy-action@v0.36.0
