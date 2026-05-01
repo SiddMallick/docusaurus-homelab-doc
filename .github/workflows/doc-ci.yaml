@@ -20,7 +20,7 @@ env:
 jobs:
 
     ci:
-        if: github.event_name == 'pull_requests' || startsWith(github.ref, 'refs/heads/feature/') 
+        if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/feature/') 
         runs-on: ubuntu-22.04
 
         steps:
@@ -114,15 +114,4 @@ jobs:
                 format: table
                 exit-code: 1
                 severity: CRITICAL,HIGH
-            
-
-
-
-
-
-          
-          
-          
-          
-            
             
