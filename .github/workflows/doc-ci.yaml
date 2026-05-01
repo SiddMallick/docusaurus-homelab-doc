@@ -20,7 +20,7 @@ env:
 jobs:
 
     ci:
-        if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/feature/')
+        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature/')
         runs-on: ubuntu-22.04
 
         steps:
@@ -96,11 +96,11 @@ jobs:
 
     
     pr-build:
-        needs: [ci, codeql]
+        needs: ci
         name: PR Docker build
         runs-on: ubuntu-22.04
 
-        if: github.event_name=='pull_request'
+        if: github.event_name=='pull_request' || github.ref == 'refs/heads/master'
 
         steps:
             - name: Checkout
