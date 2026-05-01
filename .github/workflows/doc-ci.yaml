@@ -103,6 +103,9 @@ jobs:
         if: github.event_name=='pull_request'
 
         steps:
+            - name: Checkout
+              uses: actions/checkout@v6    
+
             - name: Build Docker Image
               run: |
                 docker build -t $IMAGE_NAME:pr-${{ github.event.number }} .
