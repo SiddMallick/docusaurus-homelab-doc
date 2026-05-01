@@ -11,7 +11,7 @@ RUN npm run build
 
 
 # ---------- Runtime Stage ----------
-FROM nginx:1.27.0-alpine3.23
+FROM nginx:1.30.0-alpine-perl
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/build /usr/share/nginx/html
