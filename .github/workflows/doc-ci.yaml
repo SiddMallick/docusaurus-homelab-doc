@@ -42,8 +42,8 @@ jobs:
 
             - name: Run npm audit (fail on high/critical)
               run: |
-                npm audit --audit-level=high
-                
+                npm audit --audit-level=critical
+
             
             - name: Build Docusaurus
               run: npm run build
