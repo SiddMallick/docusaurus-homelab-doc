@@ -1,6 +1,6 @@
 {
   "label": "Homelab - v1",
-  "position": 4,
+  "position": 2,
   "link": {
     "type": "generated-index",
     "description": "Creating my own Homelab with proxmox, k3s, kubernetes etc."

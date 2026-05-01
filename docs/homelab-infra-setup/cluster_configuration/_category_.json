@@ -1,0 +1,8 @@
+{
+  "label": "Kubernetes Cluster Configuration",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "description": "Cluster Configuration"
+  }
+}
