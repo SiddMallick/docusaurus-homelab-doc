@@ -11,7 +11,7 @@ RUN npm run build
 
 
 # ---------- Runtime Stage ----------
-FROM nginx:trixie-perl
+FROM nginx:stable-alpine3.23-perl
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/build /usr/share/nginx/html
