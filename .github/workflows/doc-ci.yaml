@@ -20,7 +20,7 @@ env:
 jobs:
 
     ci:
-        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/feature/') 
+        if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/feature/') 
         runs-on: ubuntu-22.04
 
         steps:
@@ -39,6 +39,11 @@ jobs:
             
             - name: Install deps
               run: npm ci
+
+            - name: Run npm audit (fail on critical)
+              run: |
+                npm audit --audit-level=critical
+
             
             - name: Build Docusaurus
               run: npm run build
@@ -46,28 +51,67 @@ jobs:
             - name: Run Unit Tests (if any)
               run: |
                 if [ -f package.json ] && jq -e '.scripts.test' package.json > /dev/null; then
-                    npm test
+                    npm test -- --coverage
                 else
                     echo "No Tests found, skipping"
                 fi
+            
+            - name: Show detailed coverage
+              run: |
+                if [ -f coverage/coverage-summary.json ]; then
+                    cat coverage/coverage-summary.json | jq '.total'
+                fi
 
-            # ----- SAST (CodeQL) -----------
-            - name: Initialize CodeQL
+            # # ----- SAST (CodeQL) -----------
+            # - name: Initialize CodeQL
+            #   uses: github/codeql-action/init@v4
+            #   with:
+            #     languages: javascript
+            
+            # - name: Perform CodeQL Analysis
+            #   uses: github/codeql-action/analyze@v4
+    
+    codeql:
+        needs: ci
+        name: CodeQL Scan
+        runs-on: ubuntu-22.04
+
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+
+        
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+            
+            - name: Init CodeQL
               uses: github/codeql-action/init@v4
               with:
                 languages: javascript
             
+            - name: Autobuild
+              uses: github/codeql-action/autobuild@v4
+
             - name: Perform CodeQL Analysis
               uses: github/codeql-action/analyze@v4
 
-    # pr-build:
-    #     if: github.event_name == 'pull_request'
-    #     runs-on: ubuntu-22.04
+    
+    pr-build:
+        needs: [ci, codeql]
+        name: PR Docker build
+        runs-on: ubuntu-22.04
 
-    #     steps:
-    #       - name: Checkout
-    #         uses: actions/checkout@v6
-          
-          
+        if: github.event_name=='pull_request'
+
+        steps:
+            - name: Build Docker Image
+              run: |
+                docker build -t $IMAGE_NAME:pr-${{ github.event.number }} .
             
+            - name: Trivy Scan (on PR)
+              uses: aquasecurity/trivy-action@v0.36.0
+              with: 
+                image-ref: ${{ env.IMAGE_NAME }}:pr-${{ github.event.number }}
+                format: table
+                exit-code: 1
+                severity: CRITICAL,HIGH
             
