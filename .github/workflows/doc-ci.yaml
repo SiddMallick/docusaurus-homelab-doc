@@ -51,17 +51,28 @@ jobs:
             - name: Run Unit Tests (if any)
               run: |
                 if [ -f package.json ] && jq -e '.scripts.test' package.json > /dev/null; then
-                    npm test -- --coverage
+                    npm test
                 else
                     echo "No Tests found, skipping"
                 fi
             
-            - name: Show detailed coverage
-              run: |
-                if [ -f coverage/coverage-summary.json ]; then
-                    cat coverage/coverage-summary.json | jq '.total'
-                fi
+            - name: Archive Test Results
+              uses: actions/upload-artifact@v3
+              with:
+                name: Unit-Test-Results
+                path: test-results
+                retention-days: 5
 
+            - name: Report Test Coverage
+              run: npm run coverage
+            
+            - name: Archive Coverage Report
+              uses: actions/upload-artifact@v3
+              with:
+                name: Code-Coverage-Result
+                path: coverage
+                retention-days: 5
+            
             # # ----- SAST (CodeQL) -----------
             # - name: Initialize CodeQL
             #   uses: github/codeql-action/init@v4
@@ -100,7 +111,7 @@ jobs:
         name: PR Docker build
         runs-on: ubuntu-22.04
 
-        if: github.event_name=='pull_request' || github.ref == 'refs/heads/master'
+        if: github.event_name=='pull_request'
 
         steps:
             - name: Checkout
@@ -117,5 +128,3 @@ jobs:
                 format: table
                 exit-code: 1
                 severity: CRITICAL,HIGH
-            
-

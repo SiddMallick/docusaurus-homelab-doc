@@ -1,0 +1,47 @@
+name: Build and Push Docker Image
+
+on:
+    push:
+        branches:
+          - master
+
+env:
+    IMAGE_NAME: msiddhartha1600/docusaurus-homelab-docs
+
+jobs:
+  release:
+    name: Build & Push Image
+    runs-on: ubuntu-24.04
+    
+    steps:
+        - uses: actions/checkout@v6
+
+        - name: Build site
+          run: |
+            npm ci
+            npm run build
+
+        - name: Docker Login
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+
+        - name: Docker image build
+          run: |
+            docker build -t $IMAGE_NAME:latest \
+                         -t $IMAGE_NAME:${{ github.sha }} .
+
+        
+        - name: Docker Push Image
+          run: |
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:${{ github.sha }}
+        
+        - name: Trivy Scan (final)
+          uses: aquasecurity/trivy-action@v0.36.0
+          with:
+            image-ref: ${{ env.IMAGE_NAME }}:latest
+            format: table
+            exit-code: 1
+            severity: CRITICAL,HIGH
