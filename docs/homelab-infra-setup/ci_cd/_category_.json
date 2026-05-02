@@ -1,0 +1,8 @@
+{
+  "label": "CICD",
+  "position": 19,
+  "link": {
+    "type": "generated-index",
+    "description": "CICD with Github Actions and ArgoCD following a GitOps Approach"
+  }
+}

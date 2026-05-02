@@ -2,4 +2,4 @@
 sidebar_position: 12
 ---
 
-# NFS - Storage Class
+# ArgoCD

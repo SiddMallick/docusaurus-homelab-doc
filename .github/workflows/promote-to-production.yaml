@@ -32,4 +32,6 @@ jobs:
               run: |
                 docker tag $IMAGE_NAME:${{ github.event.inputs.image_sha }} $IMAGE_NAME:${{ github.event.inputs.version }}
                 docker push $IMAGE_NAME:${{ github.event.inputs.version }}
-                echo "SUCCESS: Image $IMAGE_NAME with tag ${{ github.event.inputs.version }} was pushed as a release image"
+                echo "✅ SUCCESS: Image $IMAGE_NAME with tag ${{ github.event.inputs.version }} was pushed as a release image"
+
+                

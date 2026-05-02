@@ -1,4 +1,4 @@
 ---
-sidebar_position: 13
+sidebar_position: 17
 ---
 # Jellyfin
