@@ -27,7 +27,7 @@ Thus K3s has the following dependencies already pre-shipped with it:
 - Host utilities (iptables, socat, etc)
 
 
-## K3S Installation Multi-Node
+## K3S Installation
 
 1. For installing k3s, if the debian machine is used for k3s server (deb-k3s-master) node, then run:
 
