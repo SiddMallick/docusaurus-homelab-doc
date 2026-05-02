@@ -19,3 +19,4 @@ I have recently embarked on this journey to build a robust, production-grade env
 * **Networking & Security:** Configuring local DNS, service meshes, and self-hosted secret management to ensure a secure, private ecosystem.
 
 Through this homelab, the goal is not just to host applications, but to cultivate **DevOps best practices** and build a resilient, "10/10" infrastructure that mirrors modern engineering standards.
+
