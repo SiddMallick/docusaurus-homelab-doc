@@ -32,7 +32,7 @@ Thus K3s has the following dependencies already pre-shipped with it:
 1. For installing k3s, if the debian machine is used for k3s server (deb-k3s-master) node, then run:
 
 ```bash
-curl -sfL https://get.k3s.io | sh -s - server --cluster-cidr=10.244.0.0/16 --service-cidr=10.96.0.0/16 --write-kubeconfig-mode 644
+curl -sfL https://get.k3s.io | sh -s - server --cluster-cidr=10.244.0.0/16 --service-cidr=10.96.0.0/16 --write-kubeconfig-mode 644 --disable=traefik
 ```
 
 2. Fetch master token:
