@@ -4,6 +4,8 @@ sidebar_position: 12
 
 # ArgoCD
 
+The terraform code in homelab-k3s repo already installs ArgoCD through helm using terraform.
+
 # ArgoCD Image updater:
 
 To install argocd image updater:
