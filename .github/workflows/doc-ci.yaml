@@ -23,6 +23,10 @@ jobs:
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature/') || github.event_name=='pull_request'
         runs-on: ubuntu-22.04
 
+        defaults:
+          run:
+            working-directory: ./
+
         steps:
             - name: Checkout
               uses: actions/checkout@v6
@@ -31,14 +35,11 @@ jobs:
               uses: actions/setup-node@v6
               with:
                 node-version: 20
-            - name: Cache npm
-              uses: actions/cache@v4
-              with:
-                path: ~/.npm
-                key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                cache: npm
+                cache-dependency-path: ./package-lock.json
             
             - name: Install deps
-              run: npm ci
+              run: npm ci --prefer-offline --no-audit
 
             - name: Run npm audit (fail on critical)
               run: |
