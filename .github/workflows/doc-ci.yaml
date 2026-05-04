@@ -23,10 +23,6 @@ jobs:
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature/') || github.event_name=='pull_request'
         runs-on: ubuntu-22.04
 
-        defaults:
-          run:
-            working-directory: ../../
-
         steps:
             - name: Checkout
               uses: actions/checkout@v6
