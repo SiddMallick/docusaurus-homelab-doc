@@ -1,0 +1,77 @@
+# .semgrep.yml
+# Semgrep configuration file - custom rules only
+rules:
+  # Custom rule: Detect hardcoded API keys
+  - id: hardcoded-api-key
+    patterns:
+      - pattern-either:
+          # Match common API key variable assignments
+          - pattern: $VAR = "sk_live_..."
+          - pattern: $VAR = "pk_live_..."
+          - pattern: api_key = "..."
+          - pattern: apiKey = "..."
+    message: "Hardcoded API key detected. Use environment variables instead."
+    languages: [python, javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+      owasp: "A3:2017 Sensitive Data Exposure"
+
+  # Custom rule: SQL injection prevention
+  - id: sql-injection-risk
+    patterns:
+      - pattern-either:
+          # Detect string concatenation in SQL queries
+          - pattern: |
+              $QUERY = "SELECT ... " + $USER_INPUT
+          - pattern: |
+              $QUERY = f"SELECT ... {$USER_INPUT}"
+          - pattern: |
+              cursor.execute("SELECT ... " + $VAR)
+    message: "Potential SQL injection. Use parameterized queries."
+    languages: [python]
+    severity: ERROR
+    fix: |
+      cursor.execute("SELECT ... WHERE id = %s", ($VAR,))
+
+  - id: insecure-pickle-load
+    patterns:
+      - pattern-either:
+          - pattern: pickle.load(...)
+          - pattern: pickle.loads(...)
+          - pattern: cPickle.load(...)
+    message: |
+      Pickle deserialization can lead to remote code execution.
+      Use JSON or a safe serialization format for untrusted data.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      references:
+        - https://owasp.org/www-project-web-security-testing-guide/
+
+  # Detect missing authentication in Express routes
+  - id: express-missing-auth
+    patterns:
+      # Match routes that handle sensitive operations without auth middleware
+      - pattern: |
+          app.$METHOD("/admin/...", (req, res) => { ... })
+      - pattern-not: |
+          app.$METHOD("/admin/...", $AUTH, (req, res) => { ... })
+    message: "Admin route without authentication middleware."
+    languages: [javascript, typescript]
+    severity: WARNING
+    fix: |
+      app.$METHOD("/admin/...", authMiddleware, (req, res) => { ... })
+
+  # Detect JWT without verification
+  - id: jwt-no-verify
+    patterns:
+      - pattern: jwt.decode($TOKEN)
+      - pattern-not: jwt.verify($TOKEN, ...)
+    message: |
+      JWT decoded without signature verification.
+      Use jwt.verify() to validate token authenticity.
+    languages: [javascript, typescript]
+    severity: ERROR
