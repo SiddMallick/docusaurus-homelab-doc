@@ -229,7 +229,7 @@ jobs:
             python-version: "3.12"
         
         - name: Generate Report
-          run: python sctipts/report.py
+          run: python pipeline-sctipts/report_scan.py
 
         - uses: actions/upload-artifact@v4
           with:
