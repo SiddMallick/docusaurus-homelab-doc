@@ -61,6 +61,21 @@ jobs:
             - name: Install deps
               run: npm ci --prefer-offline --no-audit
 
+            - name: Generate SBOM
+              uses: aquasecurity/trivy-action@v0.36.0
+              with:
+                scan-type: fs
+                scan-ref: .
+                format: cyclonedx
+                output: sbom.cdx.json
+
+            - name: Upload CycloneDX SBOM
+              uses: actions/upload-artifact@v7
+              with:
+                name: SBOM
+                path: sbom.cdx.json
+                retention-days: 5
+
             - name: Run npm audit (fail on critical)
               run: |
                 npm audit --audit-level=critical --json > npm-audit.json
@@ -195,4 +210,28 @@ jobs:
                 path: trivy-scan-results.json
                 retention-days: 1
 
-    
+    report:
+      needs: [ dependency-scan, semgrep, sast-codeql, container-scan]
+      runs-on: ubuntu-latest
+
+      if: always()
+
+      steps:
+
+        - uses: actions/checkout@v6
+
+        - uses: actions/download-artifact@v4
+          with:
+            path: reports
+        
+        - uses: actions/setup-python@v5
+          with:
+            python-version: "3.12"
+        
+        - name: Generate Report
+          run: python sctipts/report.py
+
+        - uses: actions/upload-artifact@v4
+          with:
+            name: security-report
+            path: security-report.md
