@@ -1,0 +1,13 @@
+# .gitleaks.toml
+title = "Gitleaks config"
+
+[[allowlists]]
+description = "Allowlisted patterns"
+paths = [
+    '''.*test.*''',
+    '''.*fixture.*''',
+]
+regexes = [
+    '''example\.com''',
+    '''localhost''',
+]

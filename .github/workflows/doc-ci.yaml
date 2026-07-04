@@ -18,11 +18,32 @@ env:
     IMAGE_NAME: msiddhartha1600/docusaurus-homelab-docs
 
 jobs:
+    secret-scan:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v6
+          with:
+            fetch-depth: 0
+        
+        - name: Run Gitleaks
+          uses: gitleaks/gitleaks-action@v3
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Run TruffleHog
+          uses: trufflesecurity/trufflehog@v3.95.5
+          with:
+            path: ./
+            base: ${{ github.event.repository.default_branch }}
+            head: HEAD
+            extra_args: --only-verified
+        
+
 
     ci:
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature/') || github.event_name=='pull_request'
         runs-on: ubuntu-22.04
-
+        needs: secret-scan
         steps:
             - name: Checkout
               uses: actions/checkout@v6
@@ -70,31 +91,31 @@ jobs:
                 name: Code-Coverage-Result
                 path: coverage
                 retention-days: 5
-    
-    # codeql:
-    #     needs: ci
-    #     name: CodeQL Scan
-    #     runs-on: ubuntu-22.04
 
-    #     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
+    sast-codeql:
+      needs: ci
+      runs-on: ubuntu-latest
+      permissions:
+        security-events: write
+        contents: read
+      steps:
+        - uses: actions/checkout@v6
 
+        - name: Initialize CodeQL
+          uses: github/codeql-action/init@v4
+          with:
+            languages: javascript, javascript-typescript
+            queries: +security-extended
         
-    #     steps:
-    #         - name: Checkout
-    #           uses: actions/checkout@v6
-            
-    #         - name: Init CodeQL
-    #           uses: github/codeql-action/init@v4
-    #           with:
-    #             languages: javascript
-            
-    #         - name: Autobuild
-    #           uses: github/codeql-action/autobuild@v4
-
-    #         - name: Perform CodeQL Analysis
-    #           uses: github/codeql-action/analyze@v4
+        - name: Autobuild
+          uses: github/codeql-action/autobuild@v4
+        
+        - name: Perform CodeQL analysis
+          uses: github/codeql-action/analyze@v4
+        
 
     semgrep:
+      needs: ci
       runs-on: ubuntu-latest
       container:
         image: semgrep/semgrep
@@ -126,7 +147,7 @@ jobs:
             exit 1
     
     pr-build:
-        needs: ci
+        needs: semgrep
         name: PR Docker build
         runs-on: ubuntu-22.04
 
