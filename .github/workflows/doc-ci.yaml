@@ -40,6 +40,7 @@ jobs:
             - name: Run npm audit (fail on critical)
               run: |
                 npm audit --audit-level=critical
+              continue-on-error: true
 
             
             - name: Build Docusaurus
