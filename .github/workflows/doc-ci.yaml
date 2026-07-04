@@ -63,10 +63,16 @@ jobs:
 
             - name: Run npm audit (fail on critical)
               run: |
-                npm audit --audit-level=critical
+                npm audit --audit-level=critical --json > npm-audit.json
               continue-on-error: true
 
-            
+            - name: Upload NPM Audit
+              uses: actions/upload-artifact@v7
+              with:
+                name: NPM Audit
+                path: npm-audit.json
+                retention-days: 5
+          
             - name: Build Docusaurus
               run: npm run build
             
@@ -107,7 +113,7 @@ jobs:
         - name: Initialize CodeQL
           uses: github/codeql-action/init@v4
           with:
-            languages: javascript, javascript-typescript
+            languages: javascript, javascript-typescript, python
             queries: +security-extended
         
         - name: Autobuild
@@ -115,6 +121,8 @@ jobs:
         
         - name: Perform CodeQL analysis
           uses: github/codeql-action/analyze@v4
+
+
         
 
     semgrep:
@@ -142,6 +150,13 @@ jobs:
           with:
             sarif_file: semgrep.sarif
           if: always()
+
+        - name: Upload SARIF file as artifact
+          uses: actions/upload-artifact@v7
+          with:
+            name: Semgrep SARIF file
+            path: semgrep.sarif
+            retention-days: 5
     
         - name: Quality Gate
           if: steps.semgrep.outcome == 'failure'
@@ -168,6 +183,16 @@ jobs:
               uses: aquasecurity/trivy-action@v0.36.0
               with: 
                 image-ref: ${{ env.IMAGE_NAME }}:pr-${{ github.event.number }}
-                format: table
+                format: json
+                output: trivy-scan-results.json
                 exit-code: 1
                 severity: CRITICAL,HIGH
+
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v7
+              with:
+                name: Trivy
+                path: trivy-scan-results.json
+                retention-days: 1
+
+    
