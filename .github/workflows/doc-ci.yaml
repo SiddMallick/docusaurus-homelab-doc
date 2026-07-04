@@ -129,7 +129,7 @@ jobs:
           uses: github/codeql-action/init@v4
           with:
             languages: javascript, javascript-typescript
-            queries: +security-extended
+            queries: +security-extended, quality
         
         - name: Autobuild
           uses: github/codeql-action/autobuild@v4
