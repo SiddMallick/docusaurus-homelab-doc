@@ -113,7 +113,7 @@ jobs:
         - name: Initialize CodeQL
           uses: github/codeql-action/init@v4
           with:
-            languages: javascript, javascript-typescript, python
+            languages: javascript, javascript-typescript
             queries: +security-extended
         
         - name: Autobuild
