@@ -13,6 +13,9 @@ on:
     pull_request:
         branches:
             - master
+    
+    schedule:
+      - cron: '0 2 * * *'
 
 env:
     IMAGE_NAME: msiddhartha1600/docusaurus-homelab-docs
@@ -40,7 +43,7 @@ jobs:
         
 
 
-    ci:
+    dependency-scan:
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/feature/') || github.event_name=='pull_request'
         runs-on: ubuntu-22.04
         needs: secret-scan
@@ -93,7 +96,7 @@ jobs:
                 retention-days: 5
 
     sast-codeql:
-      needs: ci
+      needs: dependency-scan
       runs-on: ubuntu-latest
       permissions:
         security-events: write
@@ -115,7 +118,7 @@ jobs:
         
 
     semgrep:
-      needs: ci
+      needs: dependency-scan
       runs-on: ubuntu-latest
       container:
         image: semgrep/semgrep
@@ -146,8 +149,8 @@ jobs:
             echo "Semgrep found security issues."
             exit 1
     
-    pr-build:
-        needs: semgrep
+    container-scan:
+        needs: [semgrep, sast-codeql]
         name: PR Docker build
         runs-on: ubuntu-22.04
 
